@@ -1,6 +1,6 @@
 # lolbuilds
 
-A small python applicaton that fetches item builds  from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends client, and can be used in-game. The item sets additionally shows frequent skill order used. Currently only for Windows.
+A small python script that fetches item builds from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows frequent skill order used. Currently for Windows only.
 
 Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
