@@ -310,7 +310,17 @@ def save_item_set(role, champion, items):
         }
     )
 
+    riot_champ_path = f"C:/Riot Games/League of Legends/Config/Champions/{champion}"
     riot_path = f"C:/Riot Games/League of Legends/Config/Champions/{champion}/Recommended"
+    try:
+        os.mkdir(riot_champ_path)
+    except FileExistsError:
+        pass
+
+    try:
+        os.mkdir(riot_path)
+    except FileExistsError:
+        pass
 
     champ_path = os.path.join(riot_path, f"ChampionGG_{role}.json")
     
