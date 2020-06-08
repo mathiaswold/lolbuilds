@@ -4,6 +4,8 @@ A small python script that fetches item builds from [champion.gg](https://www.ch
 
 Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
+![lolbuilds](https://i.imgur.com/4KWhcF9.png?1)
+
 ## Usage
 
 
