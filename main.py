@@ -1,6 +1,8 @@
 import requests
 import json
 import os
+import sys
+import shutil
 from bs4 import BeautifulSoup
 
 
@@ -148,6 +150,7 @@ def format_skill_order(skill_order):
         return (f"{first_skills}, {output[0]}>{output[1]}>{output[2]}")
     except:
         return "Not enough data for this skill order"
+
 
 def save_item_set(role, champion, items):
 
@@ -323,19 +326,52 @@ def save_item_set(role, champion, items):
         pass
 
     champ_path = os.path.join(riot_path, f"ChampionGG_{role}.json")
-    
+
     f = open(champ_path, "w")
     f.write(json.dumps(item_set))
     f.close()
 
 
-def main():
+def delete_item_sets():
+
     champions = get_champions()
-    for champ in champions:
-        print("Processing " + champ["name"])
-        all_items = get_items_and_skill_order(champ)
-        for role, items in all_items.items():
-            save_item_set(role, champ["name"],  items)
+
+    for champion in champions:
+        print(f"Removing {champion['name']}'s item sets")
+
+        riot_path = f"C:/Riot Games/League of Legends/Config/Champions/{champion['name']}/Recommended"
+        item_sets = os.listdir(riot_path)
+        for item_set in item_sets:
+            os.remove(os.path.join(riot_path, item_set))
+
+
+def main():
+
+    if len(sys.argv) > 1:
+        args = sys.argv[1:]
+
+        delete = ["-d", "-D", "--delete", "--DELETE"]
+
+        if all(x in delete for x in args):
+            confirmation = input(
+                "Are you sure you want to delete all item sets? [Y/n]")
+            if confirmation.lower() not in ["n", "no"]:
+                print("Deleting item sets")
+                delete_item_sets()
+                print("Done!")
+        else:
+            print(
+                f"Invalid argument given. Valid arguements are: [-d, --delete]")
+
+    else:
+        delete_item_sets()
+        champions = get_champions()
+        for champ in champions:
+            print("Processing " + champ["name"])
+            all_items = get_items_and_skill_order(champ)
+            for role, items in all_items.items():
+                save_item_set(role, champ["name"],  items)
+        print("Done!")
 
 
 if __name__ == "__main__":
