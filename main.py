@@ -1,8 +1,10 @@
-import requests
+import argparse
 import json
 import os
-import sys
 import shutil
+import sys
+
+import requests
 from bs4 import BeautifulSoup
 
 
@@ -152,7 +154,7 @@ def format_skill_order(skill_order):
         return "Not enough data for this skill order"
 
 
-def save_item_set(role, champion, items):
+def save_item_set(league_path, role, champion, items):
 
     item_set = {
         "title": champion + " " + role,
@@ -313,65 +315,76 @@ def save_item_set(role, champion, items):
         }
     )
 
-    riot_champ_path = f"C:/Riot Games/League of Legends/Config/Champions/{champion}"
-    riot_path = f"C:/Riot Games/League of Legends/Config/Champions/{champion}/Recommended"
+    champ_path = os.path.join(
+        league_path, f"Config/Champions/{champion}/Recommended")
+
     try:
-        os.mkdir(riot_champ_path)
+        os.mkdir(champ_path)
     except FileExistsError:
         pass
 
-    try:
-        os.mkdir(riot_path)
-    except FileExistsError:
-        pass
+    item_set_path = os.path.join(champ_path, f"ChampionGG_{role}.json")
 
-    champ_path = os.path.join(riot_path, f"ChampionGG_{role}.json")
-
-    f = open(champ_path, "w")
+    f = open(item_set_path, "w")
     f.write(json.dumps(item_set))
     f.close()
 
 
-def delete_item_sets():
+def delete_item_sets(league_path):
 
     champions = get_champions()
 
     for champion in champions:
-        print(f"Removing {champion['name']}'s item sets")
-
-        riot_path = f"C:/Riot Games/League of Legends/Config/Champions/{champion['name']}/Recommended"
-        item_sets = os.listdir(riot_path)
+        champ_path = os.path.join(
+            league_path, f"Config/Champions/{champion['name']}/Recommended")
+        item_sets = os.listdir(champ_path)
         for item_set in item_sets:
-            os.remove(os.path.join(riot_path, item_set))
+            os.remove(os.path.join(champ_path, item_set))
 
 
 def main():
 
-    if len(sys.argv) > 1:
-        args = sys.argv[1:]
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-d", "--delete", help="Delete all item sets", action="store_true")
+    parser.add_argument(
+        "-p", "--path", help="A custom file path to the installation folder")
+    args = parser.parse_args()
 
-        delete = ["-d", "-D", "--delete", "--DELETE"]
+    # standard League of Legends folder location on Windows
+    league_path = "C:\Riot Games\League of Legends"
 
-        if all(x in delete for x in args):
-            confirmation = input(
-                "Are you sure you want to delete all item sets? [Y/n]")
-            if confirmation.lower() not in ["n", "no"]:
-                print("Deleting item sets")
-                delete_item_sets()
-                print("Done!")
-        else:
-            print(
-                f"Invalid argument given. Valid arguements are: [-d, --delete]")
+    if args.path:
+        league_path = args.path
+        if not os.path.isdir(league_path):
+            raise SystemExit("Path does not exist: " + league_path)
+        if not "league of legends" in league_path.lower():
+            raise SystemExit("Please point to the League of Legends installation folder. \
+                \nExample: py main.py --path 'C:\Program Files\Riot Games\League of Legends'")
+    else:
+        if not os.path.isdir(league_path):
+            raise SystemExit(f"Can't find the League of Legends folder at {league_path}. \
+                \nUse --path to specify correct the path to your League of Legends folder.\
+                \nExample: py main.py --path 'C:\Program Files\Riot Games\League of Legends'")
+
+    if args.delete:
+        confirmation = input(
+            "Are you sure you want to delete all item sets? [Y/n]")
+        if confirmation.lower() in ["y", "yes", ""]:
+            print("Deleting item sets...")
+            delete_item_sets(league_path)
 
     else:
-        delete_item_sets()
+        print("Removing old item sets...")
+        delete_item_sets(league_path)
         champions = get_champions()
         for champ in champions:
-            print("Processing " + champ["name"])
+            print(f"Adding {champ['name']}'s item sets...")
             all_items = get_items_and_skill_order(champ)
             for role, items in all_items.items():
-                save_item_set(role, champ["name"],  items)
-        print("Done!")
+                save_item_set(league_path, role, champ["name"],  items)
+
+    print("Done!")
 
 
 if __name__ == "__main__":
