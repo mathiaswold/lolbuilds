@@ -339,7 +339,8 @@ def delete_item_sets(league_path):
             league_path, f"Config/Champions/{champion['name']}/Recommended")
         item_sets = os.listdir(champ_path)
         for item_set in item_sets:
-            os.remove(os.path.join(champ_path, item_set))
+            if "ChampionGG_" in item_set:
+                os.remove(os.path.join(champ_path, item_set))
 
 
 def main():
