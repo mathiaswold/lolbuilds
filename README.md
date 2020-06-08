@@ -6,10 +6,7 @@ Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
 ## Usage
 
----
-**Warning**: There script currently does not support removing the item sets. This means you have to delete the JSON files with the item sets for each champions manually from the installation folder. Use at own risk.
 
----
 Requires [python](https://www.python.org/downloads/) and [pip](https://pip.pypa.io/en/stable/installing/).
 
 
@@ -25,6 +22,21 @@ Then run `main.py`:
 py main.py
 ```
 
-**Note 1**: The python script assumes you have League of Legends installed in `C:/Riot Games/League of Legends/`. If you have the game installed in another folder you need to change variable `riot_path` on line 313 in `main.py` to the correct file path. 
+**Note**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
 
-**Note 2**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
+## Specify custom League of Legends folder
+
+You need to specify League's installation folder if it's not in the default location ("C:\Riot Games\League of Legends"). Do this by using the `--path` option:
+```
+py main.py --path <League of Legends path>
+```
+Example:
+```
+py main.py --path "C:\Program Files\Riot Games\League of Legends"
+```
+## Delete item sets
+If you want to remove all the item sets that this script made, run this command. Remember to use the `--path` option as well if you don't have League installed in "C:\Riot Games\League of Legends".
+```
+py main.py --delete
+```
+
