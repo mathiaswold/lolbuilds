@@ -39,7 +39,7 @@ WINDOWS: py main.py --path "C:\Program Files\Riot Games\League of Legends"
 MAC: python main.py --path "/Applications/League of Legends.app"
 ```
 ## Delete item sets
-If you want to remove all the item sets that this script made, run this command. Remember to use the `--path` option as well if you don't have League installed in "C:\Riot Games\League of Legends".
+If you want to remove all the item sets that this script made, run this command. Remember to use the `--path` option as well if you don't have League installed in the standard location (see step above).
 ```
 WINDOWS: py main.py --delete
 MAC: python main.py --delete
