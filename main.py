@@ -3,6 +3,7 @@ import json
 import os
 import shutil
 import sys
+from sys import platform
 
 import requests
 from bs4 import BeautifulSoup
@@ -319,7 +320,7 @@ def save_item_set(league_path, role, champion, items):
         league_path, f"Config/Champions/{champion}/Recommended")
 
     try:
-        os.mkdir(champ_path)
+        os.makedirs(champ_path)
     except FileExistsError:
         pass
 
@@ -335,15 +336,22 @@ def delete_item_sets(league_path):
     champions = get_champions()
 
     for champion in champions:
-        champ_path = os.path.join(
-            league_path, f"Config/Champions/{champion['name']}/Recommended")
-        item_sets = os.listdir(champ_path)
-        for item_set in item_sets:
-            if "ChampionGG_" in item_set:
-                os.remove(os.path.join(champ_path, item_set))
+        try:
+            champ_path = os.path.join(
+                league_path, f"Config/Champions/{champion['name']}/Recommended")
+            item_sets = os.listdir(champ_path)
+            for item_set in item_sets:
+                if "ChampionGG_" in item_set:
+                    os.remove(os.path.join(champ_path, item_set))
+        except:
+            continue
 
 
 def main():
+
+    print("#############")
+    print("# lolbuilds #")
+    print("#############")
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -352,21 +360,38 @@ def main():
         "-p", "--path", help="A custom file path to the installation folder")
     args = parser.parse_args()
 
-    # standard League of Legends folder location on Windows
-    league_path = "C:\Riot Games\League of Legends"
+    # standard League of Legends folder location for macOS / Windows
+    if platform == "darwin":
+        league_path = "/Applications/League of Legends.app"
+        macos = True
+    elif platform == "win32":
+        league_path = "C:\Riot Games\League of Legends"
+        macos = False
+    else:
+        raise SystemExit("Operating system not supported.")
 
     if args.path:
         league_path = args.path
         if not os.path.isdir(league_path):
             raise SystemExit("Path does not exist: " + league_path)
         if not "league of legends" in league_path.lower():
-            raise SystemExit("Please point to the League of Legends installation folder. \
-                \nExample: py main.py --path 'C:\Program Files\Riot Games\League of Legends'")
+            raise SystemExit("Please point to the League of Legends folder/app. \
+                \nExample: \
+                \nWINDOWS: py main.py --path 'C:\Program Files\Riot Games\League of Legends'\
+                \nMAC: python main.py --path '/Applications/League of Legends.app'")
     else:
         if not os.path.isdir(league_path):
             raise SystemExit(f"Can't find the League of Legends folder at {league_path}. \
-                \nUse --path to specify correct the path to your League of Legends folder.\
-                \nExample: py main.py --path 'C:\Program Files\Riot Games\League of Legends'")
+                \nUse --path to specify correct the path to your League of Legends folder/app.\
+                \nExample: \
+                \nWINDOWS: py main.py --path 'C:\Program Files\Riot Games\League of Legends'\
+                \nMAC: python main.py --path '/Applications/League of Legends.app'")
+
+    print(
+        f"Found League of Legends. Detected operating system: {'MacOS' if macos else 'Windows'}")
+
+    if macos:
+        league_path = os.path.join(league_path, "Contents/LoL")
 
     if args.delete:
         confirmation = input(
@@ -376,7 +401,7 @@ def main():
             delete_item_sets(league_path)
 
     else:
-        print("Removing old item sets...")
+        print("Deleting old item sets...")
         delete_item_sets(league_path)
         champions = get_champions()
         for champ in champions:

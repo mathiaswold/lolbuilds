@@ -1,6 +1,6 @@
 # lolbuilds
 
-A small python script that fetches item builds from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows frequent skill order used. Currently for Windows only.
+A small python script that fetches item builds from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows frequent skill order used. Supports Windows and MacOS.
 
 Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
@@ -21,7 +21,8 @@ pip install -r requirements.txt
 Then run `main.py`:
 
 ```
-py main.py
+WINDOWS: py main.py
+MAC: python main.py
 ```
 
 **Note**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
@@ -34,11 +35,13 @@ py main.py --path <League of Legends path>
 ```
 Example:
 ```
-py main.py --path "C:\Program Files\Riot Games\League of Legends"
+WINDOWS: py main.py --path "C:\Program Files\Riot Games\League of Legends"
+MAC: python main.py --path "/Applications/League of Legends.app"
 ```
 ## Delete item sets
 If you want to remove all the item sets that this script made, run this command. Remember to use the `--path` option as well if you don't have League installed in "C:\Riot Games\League of Legends".
 ```
-py main.py --delete
+WINDOWS: py main.py --delete
+MAC: python main.py --delete
 ```
 
