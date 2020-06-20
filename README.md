@@ -1,6 +1,6 @@
 # lolbuilds
 
-A small python script that fetches item builds from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows frequent skill order used. Supports Windows and MacOS.
+A small python script that fetches item builds from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows frequent skill order used. Supports Windows and macOS.
 
 Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
@@ -12,7 +12,7 @@ Inspired by [Championify](https://github.com/dustinblackman/Championify).
 Requires [python](https://www.python.org/downloads/) and [pip](https://pip.pypa.io/en/stable/installing/).
 
 
-Download the repository, open a command prompt (cmd) and `cd` into the folder. Install required python packages with pip:
+Download the repository, open a command prompt (cmd) / terminal and `cd` into the folder. Install required python packages with pip:
 
 ```
 pip install -r requirements.txt
@@ -29,7 +29,7 @@ MAC: python main.py
 
 ## Specify custom League of Legends folder
 
-You need to specify League's installation folder if it's not in the default location ("C:\Riot Games\League of Legends"). Do this by using the `--path` option:
+You need to specify League's installation folder if it's not in the default location (Windows: "C:\Riot Games\League of Legends", macOS: "/Applications/League of Legends.app"). Do this by using the `--path` option:
 ```
 py main.py --path <League of Legends path>
 ```
