@@ -25,7 +25,9 @@ WINDOWS: py main.py
 MAC: python main.py
 ```
 
-**Note**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
+**Note 1**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
+
+**Note 2**: [Champion.gg](https://www.champion.gg/) might gather game data for a week or more before builds are available to all champs and roles after a new patch.
 
 ## Specify custom League of Legends folder
 
@@ -44,4 +46,3 @@ If you want to remove all the item sets that this script made, run this command.
 WINDOWS: py main.py --delete
 MAC: python main.py --delete
 ```
-
