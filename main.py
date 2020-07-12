@@ -90,7 +90,7 @@ def get_items_and_skill_order(champion):
                     a.find("img").get("data-id"))
 
         except:
-            continue
+            print(f"ERROR: Build for {champion['name']} {role} not found on champion.gg")
 
         items[role] = role_items
 
