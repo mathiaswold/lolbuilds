@@ -19,12 +19,16 @@ def get_champions():
     for champion_div in soup.find_all("div", {"class": "champ-height"}):
         champion = {
             "name": "",
+            "display_name": "",
             "id": "",
             "roles": []
         }
 
         champion["name"] = champion_div.find(
             "div", {"class": "champ-index-img"}).get("class")[1]
+
+        champion["display_name"] = champion_div.find(
+            "span", {"class": "champion-name"}).contents[0]
 
         champion["id"] = champion_div.find(
             "div", {"class": "tsm-tooltip"}).get("data-id")
@@ -155,16 +159,16 @@ def format_skill_order(skill_order):
         return "Not enough data for this skill order"
 
 
-def save_item_set(league_path, role, champion, items):
+def save_item_set(league_path, role, champion_name, champion_display_name, items):
 
     item_set = {
-        "title": champion + " " + role,
+        "title": champion_display_name + " " + role,
         "type": "custom",
         "map": "any",
         "mode": "any",
         "priority": False,
         "sortrank": items["rank"],
-        "champion": champion,
+        "champion": champion_name,
         "blocks": []
     }
 
@@ -317,7 +321,7 @@ def save_item_set(league_path, role, champion, items):
     )
 
     champ_path = os.path.join(
-        league_path, f"Config/Champions/{champion}/Recommended")
+        league_path, f"Config/Champions/{champion_name}/Recommended")
 
     try:
         os.makedirs(champ_path)
@@ -405,10 +409,11 @@ def main():
         delete_item_sets(league_path)
         champions = get_champions()
         for champ in champions:
-            print(f"Adding {champ['name']}'s item sets...")
+            print(f"Adding {champ['display_name']}'s item sets...")
             all_items = get_items_and_skill_order(champ)
             for role, items in all_items.items():
-                save_item_set(league_path, role, champ["name"],  items)
+                save_item_set(league_path, role,
+                              champ["name"], champ["display_name"],  items)
 
     print("Done!")
 
