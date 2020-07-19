@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 
 
 def get_champions():
+    """ Gets all champions with their roles from champion.gg """
     body = requests.get("https://www.champion.gg/").text
 
     soup = BeautifulSoup(body, "html.parser")
@@ -33,6 +34,7 @@ def get_champions():
         champion["id"] = champion_div.find(
             "div", {"class": "tsm-tooltip"}).get("data-id")
 
+        # role rank is the priority of item sets in-game, the highest number is the default item set displayed in the shop
         role_rank = 10
         for role in champion_div.find_all("a"):
             if role.get("style") == "display:block":
@@ -44,7 +46,76 @@ def get_champions():
     return champions
 
 
+def get_skill_order(soup):
+    """ Gets the recommended skill order from champion.gg """
+
+    skill_order = {
+        "frequent": [],
+        "highest": []
+    }
+
+    for counter, skill_div in enumerate(soup.find_all("div", {"class": "skill-order"})):
+        levels = skill_div.find("div", {"class": "skill"})
+        q = levels.find_next_sibling("div", {"class": "skill"})
+        w = q.find_next_sibling("div", {"class": "skill"})
+        e = w.find_next_sibling("div", {"class": "skill"})
+        r = e.find_next_sibling("div", {"class": "skill"})
+
+        skills = {
+            "q": q,
+            "w": w,
+            "e": e,
+            "r": r
+        }
+
+        for skill, div in skills.items():
+            skills[skill] = div.find(
+                "div", {"class": "skill-selections"}).find("div")
+
+        for level in range(18):
+            for skill, div in skills.items():
+                if div.get("class") == ["selected"]:
+                    skill_order["frequent" if counter ==
+                                0 else "highest"].append(skill)
+                    for skill, div in skills.items():
+                        skills[skill] = div.find_next_sibling("div")
+                    break
+
+    return skill_order
+
+
+def format_skill_order(skill_order):
+    """ 
+    Formats recommended skill order into shorthand notation. 
+
+    Example: Q.E.W.Q, Q>E>W means lv1: Q, lv2: E, lv3: W, lv4: Q, then max Q first, then E, then W. 
+    """
+    skills = {
+        "q": 0,
+        "w": 0,
+        "e": 0,
+    }
+
+    output = []
+
+    for skill in skill_order:
+        if skill in skills:
+            skills[skill] += 1
+        for skill, count in skills.items():
+            if count == 5:
+                output.append(skill.upper())
+                skills[skill] = 0
+
+    first_skills = ".".join(skill_order[:4]).upper()
+
+    try:
+        return (f"{first_skills}, {output[0]}>{output[1]}>{output[2]}")
+    except:
+        return "Not enough data for this skill order"
+
+
 def get_items_and_skill_order(champion):
+    """ Gets items and skill order for every role for a champion """
 
     items = {}
 
@@ -90,76 +161,16 @@ def get_items_and_skill_order(champion):
                     a.find("img").get("data-id"))
 
         except:
-            print(f"ERROR: Build for {champion['name']} {role} not found on champion.gg")
+            print(
+                f"NOT FOUND: Build for {champion['name']} {role} not found on champion.gg")
 
         items[role] = role_items
 
     return items
 
 
-def get_skill_order(soup):
-
-    skill_order = {
-        "frequent": [],
-        "highest": []
-    }
-
-    for counter, skill_div in enumerate(soup.find_all("div", {"class": "skill-order"})):
-        levels = skill_div.find("div", {"class": "skill"})
-        q = levels.find_next_sibling("div", {"class": "skill"})
-        w = q.find_next_sibling("div", {"class": "skill"})
-        e = w.find_next_sibling("div", {"class": "skill"})
-        r = e.find_next_sibling("div", {"class": "skill"})
-
-        skills = {
-            "q": q,
-            "w": w,
-            "e": e,
-            "r": r
-        }
-
-        for skill, div in skills.items():
-            skills[skill] = div.find(
-                "div", {"class": "skill-selections"}).find("div")
-
-        for level in range(18):
-            for skill, div in skills.items():
-                if div.get("class") == ["selected"]:
-                    skill_order["frequent" if counter ==
-                                0 else "highest"].append(skill)
-                    for skill, div in skills.items():
-                        skills[skill] = div.find_next_sibling("div")
-                    break
-
-    return skill_order
-
-
-def format_skill_order(skill_order):
-    skills = {
-        "q": 0,
-        "w": 0,
-        "e": 0,
-    }
-
-    output = []
-
-    for skill in skill_order:
-        if skill in skills:
-            skills[skill] += 1
-        for skill, count in skills.items():
-            if count == 5:
-                output.append(skill.upper())
-                skills[skill] = 0
-
-    first_skills = ".".join(skill_order[:4]).upper()
-
-    try:
-        return (f"{first_skills}, {output[0]}>{output[1]}>{output[2]}")
-    except:
-        return "Not enough data for this skill order"
-
-
 def save_item_set(league_path, role, champion_name, champion_display_name, items):
+    """ Saves an item set for a champion for a given role. """
 
     item_set = {
         "title": champion_display_name + " " + role,
@@ -336,7 +347,7 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
 
 
 def delete_item_sets(league_path):
-
+    """ Deletes all item sets generated by this script """
     champions = get_champions()
 
     for champion in champions:
@@ -351,29 +362,36 @@ def delete_item_sets(league_path):
             continue
 
 
-def main():
-
+def clear():
+    """ Clears the terminal """
     if os.name == "nt":
         os.system("cls")
     else:
         os.system("clear")
 
 
+def print_app_info():
     print("#################")
     print("#   lolbuilds   #")
     print("# version 1.0.0 #")
     print("#################")
     print()
-    
-    
+
+
+def main():
+    """ Main program that deals with user input """
+    clear()
+    print_app_info()
+
     # standard League of Legends folder location for macOS / Windows
     if platform == "darwin":
         league_path = "/Applications/League of Legends.app"
         macos = True
     elif platform == "win32":
-        league_path = "C:\Riot gGames\League of Legends"
+        league_path = "C:\Riot Games\League of Legends"
         macos = False
     else:
+        # Exit if used on another platform than macOS / Windows
         raise SystemExit("Operating system not supported.")
 
     print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
@@ -381,81 +399,83 @@ def main():
 
     home_path = os.path.expanduser("~")
 
+    # check if a custom path is already saved in ~/.lolbuilds/config.json
     if os.path.isfile(os.path.join(home_path, ".lolbuilds", "config.json")):
         with open(os.path.join(home_path, ".lolbuilds", "config.json")) as f:
             config = json.load(f)
         league_path = config["path"]
 
+    # ask for a custom path if standard path is incorrect
     if not os.path.isdir(league_path):
         windows_path = "C:\Program Files\Riot Games\League of Legends"
         mac_path = "/Applications/League of Legends.app"
-        print(f"Can't find the League of Legends folder at the standard location ({league_path})")
+        print(
+            f"Can't find the League of Legends folder at the standard location ({league_path})")
         print("Please type or paste the correct League of Legends path.")
         print(f"Example: { mac_path if macos else windows_path }")
         print()
-        
+
         league_path = input()
         while not os.path.isdir(league_path) or "league of legends" not in league_path.lower():
             print("Please point to the League of Legends folder/app")
             print(f"Example: { mac_path if macos else windows_path }")
             league_path = input()
-        
+
+        # save the custom path in a config file in ~/.lolbuilds/config.json
         try:
             os.makedirs(os.path.join(home_path, ".lolbuilds"))
         except FileExistsError:
             pass
-
         f = open(os.path.join(home_path, ".lolbuilds", "config.json"), "w")
         f.write(json.dumps({"path": league_path}))
         f.close()
 
-    if os.name == "nt":
-        os.system("cls")
-    else:
-        os.system("clear")
-    print("#################")
-    print("#   lolbuilds   #")
-    print("# version 1.0.0 #")
-    print("#################")
-    print()
+    clear()
+    print_app_info()
     print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
     print()
     print(f"Found League of Legends at {league_path}")
 
+    # league folder structure is different on macos
     if macos:
         league_path = os.path.join(league_path, "Contents/LoL")
 
+    # choose between importing and deleting the item sets
     answer = None
     while answer not in ["", "d"]:
         print()
         print("To import item sets, press Enter")
         print("To delete item sets, press 'd' then Enter")
         print()
-        
         answer = input()
-
     print()
 
     if answer.lower() == "d":
+        # delete all item sets and exit
         print("Deleting item sets...")
         delete_item_sets(league_path)
 
     else:
+        # delete old item sets and import new ones from champion.gg
         print("Deleting old item sets...")
         delete_item_sets(league_path)
         champions = get_champions()
-        for champ in champions:
-            print(f"Adding {champ['display_name']}'s item sets...", end="\r")
-            all_items = get_items_and_skill_order(champ)
+        for champion in champions:
+            print(
+                f"Adding {champion['display_name']}'s item sets...", end="\r")
+                
+            all_items = get_items_and_skill_order(champion)
             for role, items in all_items.items():
                 save_item_set(league_path, role,
-                              champ["name"], champ["display_name"],  items)
+                              champion["name"], champion["display_name"],  items)
+
             print("                                                 ", end="\r")
-    
+
+    # last prompt before exiting the app
     print("Done!")
     answer = None
     while answer == None:
-      answer = input("Press Enter to exit") 
+        answer = input("Press Enter to exit")
 
 
 if __name__ == "__main__":
