@@ -353,69 +353,109 @@ def delete_item_sets(league_path):
 
 def main():
 
-    print("#############")
-    print("# lolbuilds #")
-    print("#############")
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-d", "--delete", help="Delete all item sets", action="store_true")
-    parser.add_argument(
-        "-p", "--path", help="A custom file path to the installation folder")
-    args = parser.parse_args()
 
+    print("#################")
+    print("#   lolbuilds   #")
+    print("# version 1.0.0 #")
+    print("#################")
+    print()
+    
+    
     # standard League of Legends folder location for macOS / Windows
     if platform == "darwin":
         league_path = "/Applications/League of Legends.app"
         macos = True
     elif platform == "win32":
-        league_path = "C:\Riot Games\League of Legends"
+        league_path = "C:\Riot gGames\League of Legends"
         macos = False
     else:
         raise SystemExit("Operating system not supported.")
 
-    if args.path:
-        league_path = args.path
-        if not os.path.isdir(league_path):
-            raise SystemExit("Path does not exist: " + league_path)
-        if not "league of legends" in league_path.lower():
-            raise SystemExit("Please point to the League of Legends folder/app. \
-                \nExample: \
-                \nWINDOWS: py main.py --path 'C:\Program Files\Riot Games\League of Legends'\
-                \nMAC: python main.py --path '/Applications/League of Legends.app'")
-    else:
-        if not os.path.isdir(league_path):
-            raise SystemExit(f"Can't find the League of Legends folder at {league_path}. \
-                \nUse --path to specify correct the path to your League of Legends folder/app.\
-                \nExample: \
-                \nWINDOWS: py main.py --path 'C:\Program Files\Riot Games\League of Legends'\
-                \nMAC: python main.py --path '/Applications/League of Legends.app'")
+    print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
+    print()
 
-    print(
-        f"Found League of Legends. Detected operating system: {'MacOS' if macos else 'Windows'}")
+    home_path = os.path.expanduser("~")
+
+    if os.path.isfile(os.path.join(home_path, ".lolbuilds", "config.json")):
+        with open(os.path.join(home_path, ".lolbuilds", "config.json")) as f:
+            config = json.load(f)
+        league_path = config["path"]
+
+    if not os.path.isdir(league_path):
+        windows_path = "C:\Program Files\Riot Games\League of Legends"
+        mac_path = "/Applications/League of Legends.app"
+        print(f"Can't find the League of Legends folder at the standard location ({league_path})")
+        print("Please type or paste the correct League of Legends path.")
+        print(f"Example: { mac_path if macos else windows_path }")
+        print()
+        
+        league_path = input()
+        while not os.path.isdir(league_path) or "league of legends" not in league_path.lower():
+            print("Please point to the League of Legends folder/app")
+            print(f"Example: { mac_path if macos else windows_path }")
+            league_path = input()
+        
+        try:
+            os.makedirs(os.path.join(home_path, ".lolbuilds"))
+        except FileExistsError:
+            pass
+
+        f = open(os.path.join(home_path, ".lolbuilds", "config.json"), "w")
+        f.write(json.dumps({"path": league_path}))
+        f.close()
+
+    if os.name == "nt":
+        os.system("cls")
+    else:
+        os.system("clear")
+    print("#################")
+    print("#   lolbuilds   #")
+    print("# version 1.0.0 #")
+    print("#################")
+    print()
+    print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
+    print()
+    print(f"Found League of Legends at {league_path}")
 
     if macos:
         league_path = os.path.join(league_path, "Contents/LoL")
 
-    if args.delete:
-        confirmation = input(
-            "Are you sure you want to delete all item sets? [Y/n]")
-        if confirmation.lower() in ["y", "yes", ""]:
-            print("Deleting item sets...")
-            delete_item_sets(league_path)
+    answer = None
+    while answer not in ["", "d"]:
+        print()
+        print("To import item sets, press Enter")
+        print("To delete item sets, press 'd' then Enter")
+        print()
+        
+        answer = input()
+
+    print()
+
+    if answer.lower() == "d":
+        print("Deleting item sets...")
+        delete_item_sets(league_path)
 
     else:
         print("Deleting old item sets...")
         delete_item_sets(league_path)
         champions = get_champions()
         for champ in champions:
-            print(f"Adding {champ['display_name']}'s item sets...")
+            print(f"Adding {champ['display_name']}'s item sets...", end="\r")
             all_items = get_items_and_skill_order(champ)
             for role, items in all_items.items():
                 save_item_set(league_path, role,
                               champ["name"], champ["display_name"],  items)
-
+            print("                                                 ", end="\r")
+    
     print("Done!")
+    answer = None
+    while answer == None:
+      answer = input("Press Enter to exit") 
 
 
 if __name__ == "__main__":
