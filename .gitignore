@@ -1,0 +1,9 @@
+.vscode
+env
+venv
+__pycache__
+*.pyc
+misc
+build
+dist
+*.spec
