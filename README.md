@@ -15,6 +15,7 @@ Simply run the executable program for your operating system (see releases) and f
 
 **Note 2**: [Champion.gg](https://www.champion.gg/) might gather game data for a week or more before builds are available to all champs and roles after a new patch.
 
+![lolbuilds_gif](https://i.imgur.com/Nmav9D0.gif)
 
 ## Run script without executables
 
