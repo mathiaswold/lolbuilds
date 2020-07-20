@@ -9,7 +9,7 @@ Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
 ## Usage
 
-Simply run the executable program for your operating system (from ![GitHub Releases](https://img.shields.io/github/downloads/mathiaswold/lolbuilds/latest/total)) and follow the prompts to import or delete item sets. The script automatically searches for your League of Legends installation folder. It will ask you to specify the correct path if you don't have League installed in the standard location.
+Simply run the executable program for your operating system (from [![GitHub Releases](https://img.shields.io/github/downloads/mathiaswold/lolbuilds/latest/total)](https://github.com/MathiasWold/lolbuilds/releases/latest)) and follow the prompts to import or delete item sets. The script automatically searches for your League of Legends installation folder. It will ask you to specify the correct path if you don't have League installed in the standard location.
 
 
 
