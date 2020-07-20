@@ -162,28 +162,29 @@ def get_items_and_skill_order(champion):
 
         except:
             print(
-                f"NOT FOUND: Build for {champion['name']} {role} not found on champion.gg")
+                f"NOT FOUND: Build for {champion['display_name']} {role} not found on champion.gg")
 
         items[role] = role_items
 
     return items
 
 
-def save_item_set(league_path, role, champion_name, champion_display_name, items):
+def save_item_set(league_path, role, champion_name, champion_display_name, items, version):
     """ Saves an item set for a champion for a given role. """
 
+    # standard layout for an item set
     item_set = {
-        "title": champion_display_name + " " + role,
+        "title": f"{champion_display_name} {role} {version}",
         "type": "custom",
         "map": "any",
         "mode": "any",
         "priority": False,
         "sortrank": items["rank"],
         "champion": champion_name,
-        "blocks": []
+        "blocks": []  # this is where the items goes
     }
 
-    # frequent starters
+    # most frequent starter items
     frequent_starters_dict = {}
     for item_id in items["frequent"]["starters"]:
         if not item_id in frequent_starters_dict:
@@ -200,6 +201,14 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
             }
         )
 
+    # add trinket to starters
+    frequent_starters.append(
+        {
+            "count": 1,
+            "id": "3340"
+        }
+    )
+
     item_set["blocks"].append(
         {
             "items": frequent_starters,
@@ -207,7 +216,7 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
         }
     )
 
-    # highest win % starters
+    # highest win % starter items
     highest_starters_dict = {}
     for item_id in items["highest"]["starters"]:
         if not item_id in highest_starters_dict:
@@ -224,6 +233,14 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
             }
         )
 
+    # add trinket to starters
+    highest_starters.append(
+        {
+            "count": 1,
+            "id": "3340"
+        }
+    )
+
     item_set["blocks"].append(
         {
             "items": highest_starters,
@@ -231,7 +248,7 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
         }
     )
 
-    # frequent full build
+    # most frequent full build
     frequent_full_dict = {}
     for item_id in items["frequent"]["full"]:
         if not item_id in frequent_full_dict:
@@ -279,6 +296,7 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
         }
     )
 
+    # add consumables with most frequent skill order in description
     item_set["blocks"].append(
         {
             "items": [
@@ -311,6 +329,7 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
         }
     )
 
+    # add trinkets with highest win % skill order in description
     item_set["blocks"].append(
         {
             "items": [
@@ -331,9 +350,11 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
         }
     )
 
+    # save the item set
     champ_path = os.path.join(
         league_path, f"Config/Champions/{champion_name}/Recommended")
 
+    # champion folders are not made by default on MacOS
     try:
         os.makedirs(champ_path)
     except FileExistsError:
@@ -341,9 +362,8 @@ def save_item_set(league_path, role, champion_name, champion_display_name, items
 
     item_set_path = os.path.join(champ_path, f"ChampionGG_{role}.json")
 
-    f = open(item_set_path, "w")
-    f.write(json.dumps(item_set))
-    f.close()
+    with open(item_set_path, "w") as f:
+        f.write(json.dumps(item_set))
 
 
 def delete_item_sets(league_path):
@@ -362,6 +382,96 @@ def delete_item_sets(league_path):
             continue
 
 
+def get_lol_version():
+    """ Get current League of Legends version """
+    versions = json.loads(requests.get(
+        "https://ddragon.leagueoflegends.com/api/versions.json").text)
+    # reformats from 10.14.5 to 10.14
+    latest = ".".join(versions[0].split(".")[:2])
+    return latest
+
+
+def get_championgg_version():
+    """ Get current champion.gg version """
+    body = requests.get("https://www.champion.gg/").text
+    soup = BeautifulSoup(body, "html.parser")
+    return soup.find("strong").text
+
+
+def get_from_config(key):
+    """ Get value from key in config """
+    home_path = os.path.expanduser("~")
+
+    if os.path.isfile(os.path.join(home_path, ".lolbuilds", "config.json")):
+        # if config is made
+        with open(os.path.join(home_path, ".lolbuilds", "config.json")) as f:
+            config = json.load(f)
+    else:
+        # return standard values
+        config = {
+            "path": None,
+            "local_item_version": None
+        }
+    return config[key]
+
+
+def save_to_config(key, value):
+    """ Save a (key, value) pair to the local config file in ~/.lolbuilds/config.json """
+    home_path = os.path.expanduser("~")
+
+    try:
+        os.makedirs(os.path.join(home_path, ".lolbuilds"))
+
+    except FileExistsError:
+        # config already exists
+        with open(os.path.join(home_path, ".lolbuilds", "config.json"), "r") as f:
+            config = json.load(f)
+            config[key] = value
+
+        with open(os.path.join(home_path, ".lolbuilds", "config.json"), "w") as f:
+            f.write(json.dumps(config))
+
+    else:
+        # config is created for the first time
+        with open(os.path.join(home_path, ".lolbuilds", "config.json"), "w") as f:
+            config = {
+                "path": None,
+                "local_item_version": None
+            }
+            config[key] = value
+            f.write(json.dumps(config))
+
+
+def print_script_info():
+    """ Prints script title and version info """
+    print("#####################")
+    print("#      lolbuilds    #")
+    print("#       v1.0.0      #")
+    print("#  by Mathias Wold  #")
+    print("#####################")
+    print()
+
+    # compare local item set version to current champion.gg and LoL version
+    current_lol_version = get_lol_version()
+    championgg_version = get_championgg_version()
+    local_version = get_from_config('local_item_version')
+
+    championgg_outdated = ""
+    if float(current_lol_version) > float(championgg_version):
+        championgg_outdated = "(Not updated to new patch yet)"
+
+    local_outdated = ""
+    if local_version is not None:
+        if float(championgg_version) > float(local_version):
+            local_outdated = "(outdated!)"
+
+    print(f"Current LoL version: {current_lol_version}")
+    print(
+        f"Current champion.gg version: {championgg_version} {championgg_outdated}")
+    print(f"Local item set version: {local_version} {local_outdated}")
+    print()
+
+
 def clear():
     """ Clears the terminal """
     if os.name == "nt":
@@ -370,18 +480,10 @@ def clear():
         os.system("clear")
 
 
-def print_app_info():
-    print("#################")
-    print("#   lolbuilds   #")
-    print("# version 1.0.0 #")
-    print("#################")
-    print()
-
-
 def main():
     """ Main program that deals with user input """
     clear()
-    print_app_info()
+    print_script_info()
 
     # standard League of Legends folder location for macOS / Windows
     if platform == "darwin":
@@ -395,15 +497,13 @@ def main():
         raise SystemExit("Operating system not supported.")
 
     print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
-    print()
 
     home_path = os.path.expanduser("~")
 
     # check if a custom path is already saved in ~/.lolbuilds/config.json
-    if os.path.isfile(os.path.join(home_path, ".lolbuilds", "config.json")):
-        with open(os.path.join(home_path, ".lolbuilds", "config.json")) as f:
-            config = json.load(f)
-        league_path = config["path"]
+    saved_path = get_from_config("path")
+    if saved_path is not None:
+        league_path = saved_path
 
     # ask for a custom path if standard path is incorrect
     if not os.path.isdir(league_path):
@@ -422,18 +522,12 @@ def main():
             league_path = input()
 
         # save the custom path in a config file in ~/.lolbuilds/config.json
-        try:
-            os.makedirs(os.path.join(home_path, ".lolbuilds"))
-        except FileExistsError:
-            pass
-        f = open(os.path.join(home_path, ".lolbuilds", "config.json"), "w")
-        f.write(json.dumps({"path": league_path}))
-        f.close()
+        save_to_config("path", league_path)
 
-    clear()
-    print_app_info()
-    print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
-    print()
+        clear()
+        print_script_info()
+        print(f"Detected operating system: {'MacOS' if macos else 'Windows'}")
+
     print(f"Found League of Legends at {league_path}")
 
     # league folder structure is different on macos
@@ -453,23 +547,28 @@ def main():
     if answer.lower() == "d":
         # delete all item sets and exit
         print("Deleting item sets...")
+        save_to_config("local_item_version", None)
         delete_item_sets(league_path)
 
     else:
         # delete old item sets and import new ones from champion.gg
         print("Deleting old item sets...")
         delete_item_sets(league_path)
+
+        championgg_version = get_championgg_version()
+        save_to_config("local_item_version", championgg_version)
+
         champions = get_champions()
         for champion in champions:
             print(
                 f"Adding {champion['display_name']}'s item sets...", end="\r")
-                
+
             all_items = get_items_and_skill_order(champion)
             for role, items in all_items.items():
                 save_item_set(league_path, role,
-                              champion["name"], champion["display_name"],  items)
+                              champion["name"], champion["display_name"], items, championgg_version)
 
-            print("                                                 ", end="\r")
+            print(" "*80, end="\r")
 
     # last prompt before exiting the app
     print("Done!")
