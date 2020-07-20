@@ -9,7 +9,9 @@ Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
 ## Usage
 
-Simply run the executable program for your operating system (download from [releases](https://github.com/MathiasWold/lolbuilds/releases)) and follow the prompts to import or delete item sets. The script automatically searches for your League of Legends installation folder. It will ask you to specify the correct path if you don't have League installed in the standard location.
+Simply run the executable program for your operating system (from ![GitHub Releases](https://img.shields.io/github/downloads/mathiaswold/lolbuilds/latest/total)) and follow the prompts to import or delete item sets. The script automatically searches for your League of Legends installation folder. It will ask you to specify the correct path if you don't have League installed in the standard location.
+
+
 
 **Note 1**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
 
