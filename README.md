@@ -1,6 +1,6 @@
 # lolbuilds
 
-A small python script that fetches item builds from [champion.gg](https://www.champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows recommended skill order. Supports Windows and macOS.
+A small python script that fetches item builds from [champion.gg](https://champion.gg/) (most frequent and highest win %) and converts them into item sets. The items sets for every champion and role gets saved to your League of Legends installation folder, and can be used in-game. The item sets additionally shows recommended skill order. Supports Windows and macOS.
 
 Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
@@ -15,7 +15,7 @@ Simply run the executable program for your operating system (from [![GitHub Rele
 
 **Note 1**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
 
-**Note 2**: [Champion.gg](https://www.champion.gg/) might gather game data for a week or more before builds are available to all champs and roles after a new patch.
+**Note 2**: [Champion.gg](https://champion.gg/) might gather game data for a week or more before builds are available to all champs and roles after a new patch.
 
 ![lolbuilds_gif](https://i.imgur.com/Nmav9D0.gif)
 
