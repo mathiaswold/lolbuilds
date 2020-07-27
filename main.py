@@ -1,8 +1,8 @@
 import os
 import sys
 
-from sources import championgg
-from utils import config, files, versions
+import sources
+from utils import config, versions
 
 
 def clear():
@@ -22,28 +22,17 @@ def print_script_info():
     print("#####################")
     print()
 
-    # compare local item set version to current champion.gg and LoL version
+    # compare local item set version to current source and LoL version to check if item sets are outdated
     current_lol_version = versions.get_lol_version()
-    championgg_version = championgg.get_version()
-    local_version = config.get("ChampionGG")
-
-    championgg_outdated = ""
-    if float(current_lol_version) > float(championgg_version):
-        championgg_outdated = "(Not updated to new patch yet)"
-
-    local_outdated = ""
-    if local_version is not None:
-        if float(championgg_version) > float(local_version):
-            local_outdated = "(outdated!)"
-
     print(f"Current LoL version: {current_lol_version}")
-    print(
-        f"Current champion.gg version: {championgg_version} {championgg_outdated}")
-    print(f"Local item set version: {local_version} {local_outdated}")
+    print()
+    for source in sources.SOURCES:
+        versions.check_source_version(source, current_lol_version)
     print()
 
 
 def update_league_path():
+    """ Finds and saves the correct League of Legends path to the config """
     # standard League of Legends folder location for macOS / Windows
     if sys.platform == "darwin":
         league_path = "/Applications/League of Legends.app/Contents/LoL"
@@ -108,16 +97,12 @@ def main():
 
     if answer.lower() == "d":
         # delete all item sets and exit
-        print("Deleting item sets...")
-        config.save("local_item_version", None)
-        files.delete_all()
-
+        for source in sources.SOURCES:
+            source.delete_item_sets()
     else:
-        # delete old item sets and import new ones from champion.gg
-        print("Deleting old item sets...")
-        files.delete_all()
-
-        championgg.import_item_sets()
+        # delete old item sets and import new ones from all sources
+        for source in sources.SOURCES:
+            source.import_item_sets()
 
     # last prompt before exiting the app
     print("Done!")

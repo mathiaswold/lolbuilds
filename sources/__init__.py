@@ -1,1 +1,6 @@
-from .championgg import championgg
+from .championgg import Championgg
+
+# list of implemented sources
+SOURCES = [
+    Championgg("championgg")
+]
