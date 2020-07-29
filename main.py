@@ -121,6 +121,11 @@ def main():
     else:
         # delete old item sets and import new ones from all sources
         # uses multiprocessing to import from multiple sources at once
+        
+        # for macos support
+        if sys.platform == "darwin":
+            multiprocessing.set_start_method("fork")
+
         p = multiprocessing.Pool(processes=min(len(SOURCES), os.cpu_count()))
 
         for source in SOURCES:
@@ -138,7 +143,7 @@ def main():
 
 
 if __name__ == "__main__":
-    # this line is needed for windows multiprocessing to work in the freezed lolbuilds.exe file
     multiprocessing.freeze_support()
+    # the line above is needed for windows multiprocessing to work in the freezed lolbuilds.exe file
 
     main()
