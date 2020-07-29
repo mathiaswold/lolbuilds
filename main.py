@@ -2,8 +2,10 @@ import multiprocessing
 import os
 import sys
 
-import sources
+from sources import SOURCES
 from utils import config, versions
+
+LOLBUILDS_VERSION = "1.2.0"
 
 
 def clear():
@@ -18,16 +20,19 @@ def print_script_info():
     """ Prints script title and version info """
     print("#####################")
     print("#      LoLBuilds    #")
-    print("#       v1.1.0      #")
+    print(f"#       v{LOLBUILDS_VERSION}      #")
     print("#  by Mathias Wold  #")
     print("#####################")
     print()
+
+    # check for new releases of LoLBuilds
+    versions.check_lolbuilds_version(LOLBUILDS_VERSION)
 
     # compare local item set version to current source and LoL version to check if item sets are outdated
     current_lol_version = versions.get_lol_version()
     print(f"Current LoL version: {current_lol_version}")
     print()
-    for source in sources.SOURCES:
+    for source in SOURCES:
         versions.check_source_version(source, current_lol_version)
     print()
 
@@ -86,9 +91,6 @@ def main():
 
     update_league_path()
 
-    # imports all sources from sources/__init__.py
-    SOURCES = sources.SOURCES
-
     # choose between importing or deleting item sets
     answer = None
 
@@ -121,7 +123,7 @@ def main():
     else:
         # delete old item sets and import new ones from all sources
         # uses multiprocessing to import from multiple sources at once
-        
+
         # for macos support
         if sys.platform == "darwin":
             multiprocessing.set_start_method("fork")

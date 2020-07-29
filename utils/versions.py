@@ -2,8 +2,34 @@ import json
 from datetime import date
 
 import requests
+from bs4 import BeautifulSoup
+from packaging import version
 
 from utils import config
+
+
+def check_lolbuilds_version(local_version):
+    """ Compares the local version of LoLBuilds to the latest release from github """
+
+    response = requests.get(
+        "https://github.com/MathiasWold/lolbuilds/releases/latest")
+
+    html = response.text
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    latest_version = soup.find(
+        "span", {"class": "css-truncate-target"}).text.replace("v", "")
+
+    # if local version is outdated
+    if version.parse(local_version) < version.parse(latest_version):
+        print(f"A new release of LoLBuilds is available! (v{latest_version})")
+        print("---> Download from https://github.com/MathiasWold/lolbuilds")
+        print()
+        answer = None
+        while answer == None:
+            answer = input("Press any key to continue")
+        print()
 
 
 def get_lol_version():
@@ -24,7 +50,7 @@ def check_source_version(source, lol_version):
         if float(lol_version) > float(source_version):
             source_outdated = " (Not updated to new patch yet)"
     except:
-        # source_verson is not a number
+        # source_version is not a number
         pass
 
     local_version = config.get(source.name)
@@ -33,7 +59,7 @@ def check_source_version(source, lol_version):
         if float(source_version) > float(local_version):
             local_outdated = " (outdated!)"
     except:
-        # source_verson is not a number
+        # local_version is not a number
         pass
 
     print(

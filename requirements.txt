@@ -6,3 +6,4 @@ pycodestyle==2.6.0
 requests==2.23.0
 soupsieve==2.0.1
 urllib3==1.25.9
+packaging==20.4
