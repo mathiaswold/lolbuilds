@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import sys
 
@@ -85,31 +86,59 @@ def main():
 
     update_league_path()
 
-    # choose between importing and deleting the item sets
+    # imports all sources from sources/__init__.py
+    SOURCES = sources.SOURCES
+
+    # choose between importing or deleting item sets
     answer = None
-    while answer not in ["", "d"]:
+
+    # only accept answers "", "d" (delete) or source name
+    while answer not in ["", "d"] + [source.name for source in SOURCES]:
         print()
-        print("To import item sets, press Enter")
-        print("To delete item sets, press 'd' then Enter")
+        print("-"*36, "USAGE", "-"*36)
+        print("* To import item sets from all sources, press Enter")
+        print("* To delete all item sets, press 'd' then Enter")
         print()
-        answer = input()
+        for source in SOURCES:
+            print(
+                f"* To only import item sets from {source.name.capitalize()}, type '{source.name}' then press Enter")
+        print("-"*79)
+        print()
+        answer = input().lower()
     print()
 
     if answer.lower() == "d":
         # delete all item sets and exit
-        for source in sources.SOURCES:
+        for source in SOURCES:
             source.delete_item_sets()
+
+    elif answer.lower() in [source.name for source in SOURCES]:
+        # delete old item sets and import new ones from specified source
+        for source in SOURCES:
+            if answer.lower() == source.name:
+                source.import_item_sets()
+                break
     else:
         # delete old item sets and import new ones from all sources
-        for source in sources.SOURCES:
-            source.import_item_sets()
+        # uses multiprocessing to import from multiple sources at once
+        p = multiprocessing.Pool(processes=min(len(SOURCES), os.cpu_count()))
+
+        for source in SOURCES:
+            p.apply_async(source.import_item_sets)
+
+        # waits for all source imports to be done before continuing
+        p.close()
+        p.join()
 
     # last prompt before exiting the app
-    print("Done!")
+    print("\nDone!")
     answer = None
     while answer == None:
         answer = input("Press Enter to exit")
 
 
 if __name__ == "__main__":
+    # this line is needed for windows multiprocessing to work in the freezed lolbuilds.exe file
+    multiprocessing.freeze_support()
+
     main()

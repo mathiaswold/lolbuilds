@@ -1,4 +1,5 @@
 import json
+from datetime import date
 
 import requests
 
@@ -19,14 +20,21 @@ def check_source_version(source, lol_version):
 
     source_version = source.get_version()
     source_outdated = ""
-    if float(lol_version) > float(source_version):
-        source_outdated = " (Not updated to new patch yet)"
+    try:
+        if float(lol_version) > float(source_version):
+            source_outdated = " (Not updated to new patch yet)"
+    except:
+        # source_verson is not a number
+        pass
 
     local_version = config.get(source.name)
     local_outdated = ""
-    if local_version is not None:
+    try:
         if float(source_version) > float(local_version):
             local_outdated = " (outdated!)"
+    except:
+        # source_verson is not a number
+        pass
 
     print(
-        f"{source.name} version: {source_version}{source_outdated}, imported version: {local_version}{local_outdated}")
+        f"{source.name.capitalize()} version: {source_version}{source_outdated}, imported version: {local_version}{local_outdated}")

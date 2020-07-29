@@ -1,14 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 
-from sources.source import Source
+from sources import Source
 
 
 class Championgg(Source):
 
-    def __init__(self, name):
+    def __init__(self):
         """ Implements champion.gg as a source """
-        super().__init__(name)
+        super().__init__("championgg")
 
     def get_champions(self):
         """ Gets all champions with their roles from champion.gg """
@@ -35,12 +35,9 @@ class Championgg(Source):
             champion["id"] = champion_div.find(
                 "div", {"class": "tsm-tooltip"}).get("data-id")
 
-            # role rank is the priority of item sets in-game, the highest number is the default item set displayed in the shop
-            role_rank = 10
             for role in champion_div.find_all("a"):
                 if role.get("style") == "display:block":
-                    champion["roles"].append((role.string.strip(), role_rank))
-                    role_rank -= 1
+                    champion["roles"].append(role.string.strip())
 
             champions.append(champion)
 
