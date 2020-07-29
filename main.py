@@ -17,8 +17,8 @@ def clear():
 def print_script_info():
     """ Prints script title and version info """
     print("#####################")
-    print("#      lolbuilds    #")
-    print("#       v1.0.0      #")
+    print("#      LoLBuilds    #")
+    print("#       v1.1.0      #")
     print("#  by Mathias Wold  #")
     print("#####################")
     print()
