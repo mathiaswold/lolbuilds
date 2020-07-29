@@ -1,6 +1,11 @@
-from .championgg import Championgg
+# template class for creating sources
+from .source import Source
 
-# list of implemented sources
+# implemented sources
+from .championgg import Championgg
+from .probuilds import Probuilds
+
 SOURCES = [
-    Championgg("championgg")
+    Championgg(),
+    Probuilds()
 ]
