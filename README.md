@@ -14,7 +14,7 @@ Inspired by [Championify](https://github.com/dustinblackman/Championify).
 
 Simply run the program for your operating system (from [![GitHub Releases](https://img.shields.io/github/downloads/mathiaswold/lolbuilds/latest/total)](https://github.com/MathiasWold/lolbuilds/releases/latest)) and follow the prompts to import or delete item sets. LoLBuilds automatically searches for your League of Legends installation folder. It will ask you to specify the correct installation path if you don't have League of Legends installed in the standard location.
 
-Sources currently implemented: champion.gg, probuilds.net and op.gg
+Sources currently implemented: [champion.gg](https://champion.gg/), [probuilds.net](https://probuilds.net) and [op.gg](https://www.op.gg/)
 
 **Note 1**: Due to the League of Legends' limitations, the item sets will only be available in-game, not in the client.
 
@@ -48,6 +48,10 @@ MAC: python main.py
 LoLBuilds looks at all builds available at sources like champion.gg and converts them to item sets to be used in-game. This is done by creating json-files containing the builds and placing them in a specific location* in your League of Legends installation folder. The program does not touch any other League of Legends files than the json files it creates.
 
 \* Windows example: `C:/Riot Games/League of Legends/Config/Champions/[champion]/Recommended`
+
+**How often should i run LoLBuilds and import item sets?**
+
+You should run LoLBuilds 3-4 days after a LoL patch comes out. A LoL patch normally comes out every two weeks. LoLBuilds tells you if any of the sources are outdated!
 
 **Where is the config file stored?**
 
