@@ -16,20 +16,35 @@ def _format_skill_order(skill_order):
         "e": 0,
     }
 
-    output = []
+    shorthand = []
 
     for skill in skill_order:
+        skill = skill.lower()
         if skill in skills:
             skills[skill] += 1
         for skill, count in skills.items():
             if count == 5:
-                output.append(skill.upper())
+                shorthand.append(skill.upper())
                 skills[skill] = 0
 
-    first_skills = ".".join(skill_order[:4]).upper()
+    for key in ["q", "w", "e"]:
+        if skills[key] == 0:
+            del skills[key]
+
+    # in case of skill_order with fewer than 18 skills
+    if len(skills) > 0:
+        shorthand_list = sorted(
+            skills.items(), key=lambda e: e[1], reverse=True)
+        for skill in shorthand_list:
+            shorthand.append(skill[0].upper())
 
     try:
-        return (f"{first_skills}, {output[0]}>{output[1]}>{output[2]}")
+        # shorthand format: Q>E>W
+        shorthand = f"{shorthand[0]}>{shorthand[1]}>{shorthand[2]}"
+        # first skills format: Q.E.W.Q
+        first_skills = ".".join(skill_order[:4]).upper()
+        return (f"{first_skills}, {shorthand}")
+
     except:
         return "Not enough data for this skill order"
 

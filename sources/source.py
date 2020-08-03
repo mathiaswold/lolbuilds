@@ -85,14 +85,38 @@ class Source:
         # roles supported, create an item set per role
         if self.roles:
             for counter, role in enumerate(champion["roles"]):
+                try:
+                    items = self.get_items(champion, role)
+                    skill_order = self.get_skill_order(champion, role)
 
-                items = self.get_items(champion, role)
-                skill_order = self.get_skill_order(champion, role)
+                    item_set = {
+                        "role": role,
+                        # add sort_rank if roles are supported, higher sort rank equals higher position in the item set list in-game
+                        "sort_rank": 10 - counter,
+                        "frequent": {
+                            "full": items["frequent"]["full"],
+                            "starters": items["frequent"]["starters"],
+                            "skill_order": skill_order["frequent"]
+                        },
+                        "highest": {
+                            "full": items["highest"]["full"],
+                            "starters": items["highest"]["starters"],
+                            "skill_order": skill_order["highest"]
+                        }
+                    }
+
+                    item_sets.append(item_set)
+                except:
+                    print(
+                        f"ERROR: Build for {champion['display_name']} {role} not found on {self.name}")
+
+        # roles not supported, create only one item set
+        else:
+            try:
+                items = self.get_items(champion)
+                skill_order = self.get_skill_order(champion)
 
                 item_set = {
-                    "role": role,
-                    # add sort_rank if roles are supported, higher sort rank equals higher position in the item set list in-game
-                    "sort_rank": 10 - counter,
                     "frequent": {
                         "full": items["frequent"]["full"],
                         "starters": items["frequent"]["starters"],
@@ -107,25 +131,9 @@ class Source:
 
                 item_sets.append(item_set)
 
-        # roles not supported, create only one item set
-        else:
-            items = self.get_items(champion)
-            skill_order = self.get_skill_order(champion)
-
-            item_set = {
-                "frequent": {
-                    "full": items["frequent"]["full"],
-                    "starters": items["frequent"]["starters"],
-                    "skill_order": skill_order["frequent"]
-                },
-                "highest": {
-                    "full": items["highest"]["full"],
-                    "starters": items["highest"]["starters"],
-                    "skill_order": skill_order["highest"]
-                }
-            }
-
-            item_sets.append(item_set)
+            except:
+                print(
+                    f"ERROR: Build for {champion['display_name']} not found on {self.name}")
 
         return item_sets
 
@@ -156,7 +164,12 @@ class Source:
 
         config.save(self.name, None)
 
-        champions = self.get_champions()
+        try:
+            champions = self.get_champions()
+        except:
+            print(
+                f"ERROR: Could not delete item sets from {self.name}. This likely happened because of a bad connection to {self.name}.")
+            return
 
         for champion in champions:
             files.delete(champion, self.name)

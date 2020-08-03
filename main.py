@@ -98,32 +98,54 @@ def main():
     while answer not in ["", "d"] + [source.name for source in SOURCES]:
         print()
         print("-"*36, "USAGE", "-"*36)
+        print("Import:")
         print("* To import item sets from all sources, press Enter")
-        print("* To delete all item sets, press 'd' then Enter")
-        print()
         for source in SOURCES:
             print(
                 f"* To only import item sets from {source.name.capitalize()}, type '{source.name}' then press Enter")
+        print()
+        print("Delete:")
+        print("* To delete item sets from one or more sources, press 'd' then Enter")
         print("-"*79)
         print()
         answer = input().lower()
     print()
 
+    # delete items sets
     if answer.lower() == "d":
-        # delete all item sets and exit
+        # delete one or more item sets and exit
+        clear()
+        answer = None
+        while answer not in ["d"] + [source.name for source in SOURCES]:
+            print("* To delete item sets from all sources, type 'd' then enter")
+            for source in SOURCES:
+                print(
+                    f"* To only delete item sets from {source.name.capitalize()}, type '{source.name}' then press Enter")
+            print()
+            answer = input().lower()
+
+        # delete item sets from one specified source
+        if answer.lower() in [source.name for source in SOURCES]:
+            for source in SOURCES:
+                if answer.lower() == source.name:
+                    source.delete_item_sets()
+                    break
+
+        # delete item sets from all sources
+        elif answer == "d":
         for source in SOURCES:
             source.delete_item_sets()
 
-    elif answer.lower() in [source.name for source in SOURCES]:
         # delete old item sets and import new ones from specified source
+    elif answer.lower() in [source.name for source in SOURCES]:
         for source in SOURCES:
             if answer.lower() == source.name:
                 source.import_item_sets()
                 break
-    else:
+
         # delete old item sets and import new ones from all sources
         # uses multiprocessing to import from multiple sources at once
-
+    else:
         # for macos support
         if sys.platform == "darwin":
             multiprocessing.set_start_method("fork")
@@ -141,11 +163,12 @@ def main():
     print("\nDone!")
     answer = None
     while answer == None:
-        answer = input("Press Enter to exit")
+        answer = input("Press Enter to go back, or close this window if you want to exit")
 
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
     # the line above is needed for windows multiprocessing to work in the freezed lolbuilds.exe file
 
+    while True:
     main()
