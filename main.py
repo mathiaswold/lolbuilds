@@ -1,6 +1,7 @@
 import multiprocessing
 import os
 import sys
+import time
 
 from sources import SOURCES
 from utils import config, versions
@@ -154,6 +155,8 @@ def main():
 
         for source in SOURCES:
             p.apply_async(source.import_item_sets)
+            # sleep to make sure config doesn't get accessed by more than one process at once
+            time.sleep(3)
 
         # waits for all source imports to be done before continuing
         p.close()
