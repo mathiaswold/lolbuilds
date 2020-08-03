@@ -5,7 +5,7 @@ import sys
 from sources import SOURCES
 from utils import config, versions
 
-LOLBUILDS_VERSION = "1.2.0"
+LOLBUILDS_VERSION = "1.3.0"
 
 
 def clear():
@@ -133,18 +133,18 @@ def main():
 
         # delete item sets from all sources
         elif answer == "d":
-        for source in SOURCES:
-            source.delete_item_sets()
+            for source in SOURCES:
+                source.delete_item_sets()
 
-        # delete old item sets and import new ones from specified source
+    # delete old item sets and import new ones from specified source
     elif answer.lower() in [source.name for source in SOURCES]:
         for source in SOURCES:
             if answer.lower() == source.name:
                 source.import_item_sets()
                 break
 
-        # delete old item sets and import new ones from all sources
-        # uses multiprocessing to import from multiple sources at once
+    # delete old item sets and import new ones from all sources
+    # uses multiprocessing to import from multiple sources at once
     else:
         # for macos support
         if sys.platform == "darwin":
@@ -171,4 +171,4 @@ if __name__ == "__main__":
     # the line above is needed for windows multiprocessing to work in the freezed lolbuilds.exe file
 
     while True:
-    main()
+        main()
