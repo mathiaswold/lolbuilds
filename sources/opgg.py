@@ -27,8 +27,12 @@ class Opgg(Source):
             }
 
             champion["name"] = champion_div.get("data-champion-key")
-            champion["display_name"] = champion_div.find("a").find(
-                "div", {"class": "champion-index__champion-item__name"}).text
+            try:
+                champion["display_name"] = champion_div.find("a").find(
+                    "div", {"class": "champion-index__champion-item__name"}).text
+            except:
+                # champion doesn't have enough data and thus no stats --> skip
+                continue
 
             for role_div in champion_div.find("a").find_all("div", {"class": "champion-index__champion-item__position"}):
 
