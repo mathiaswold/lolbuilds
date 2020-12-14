@@ -168,7 +168,7 @@ class Source:
             champions = self.get_champions()
         except:
             print(
-                f"ERROR: Could not delete item sets from {self.name}. This likely happened because of a bad connection to {self.name}.")
+                f"ERROR: Could not get the champion list from {self.name}. This likely happened because of a bad connection to {self.name}, or because {self.name} changed something on their site.")
             return
 
         for champion in champions:
