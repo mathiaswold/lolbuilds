@@ -5,9 +5,11 @@ from .source import Source
 from .championgg import Championgg
 from .probuilds import Probuilds
 from .opgg import Opgg
+from .metasrc import Metasrc
 
 SOURCES = [
     Championgg(),
     Probuilds(),
-    Opgg()
+    Opgg(),
+    # Metasrc()
 ]
