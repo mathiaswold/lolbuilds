@@ -7,7 +7,8 @@ from .probuilds import Probuilds
 from .opgg import Opgg
 
 SOURCES = [
-    Championgg(),
+    # temporarily disabled since championgg source needs an update to the new web site
+    # Championgg(),
     Probuilds(),
     Opgg()
 ]

@@ -1,6 +1,8 @@
 # LoLBuilds
 [![GitHub Releases](https://img.shields.io/github/downloads/mathiaswold/lolbuilds/latest/total)](https://github.com/MathiasWold/lolbuilds/releases/latest)
 
+**[champion.gg](https://champion.gg/) is temporarily disabled due to its new website layout**
+
 LoLBuilds is a small python program that fetches item builds from sources such as [champion.gg](https://champion.gg/) and [probuilds.net](https://probuilds.net/) (most frequent and highest win % builds) and converts them into item sets to be used in League of Legends. LoLBuilds imports item sets for each role the champion is played in, and additionally shows the recommended skill order. Supports Windows and macOS.
 
 Inspired by [Championify](https://github.com/dustinblackman/Championify).
